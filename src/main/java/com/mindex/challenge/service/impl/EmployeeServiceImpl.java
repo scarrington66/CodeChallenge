@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -45,5 +46,28 @@ public class EmployeeServiceImpl implements EmployeeService {
         LOG.debug("Updating employee [{}]", employee);
 
         return employeeRepository.save(employee);
+    }
+
+    @Override
+
+    public int calculateNumberOfReports(Employee employee) {
+        // Start with 0 reports for the current employee
+        int numberOfReports = 0;
+
+        // Check if the employee has directReports
+        List<Employee> directReports = employee.getDirectReports();
+        if (directReports != null && !directReports.isEmpty()) {
+            // Loop through each direct report and calculate their reports recursively
+            for (Employee directReport : directReports) {
+                if (directReport != null) {
+                    // Count the direct report
+                    numberOfReports++;
+
+                    // Calculate the number of reports for the direct report recursively
+                    numberOfReports += calculateNumberOfReports(directReport);
+                }
+            }
+        }
+        return numberOfReports;
     }
 }
